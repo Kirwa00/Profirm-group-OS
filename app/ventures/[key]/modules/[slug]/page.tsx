@@ -9,6 +9,16 @@ import FleetOperations from "@/components/modules/fleet-operations";
 import CilPlant from "@/components/modules/cil-plant";
 import AssetManagement from "@/components/modules/asset-management";
 import GrowthOperations from "@/components/modules/growth-operations";
+import SdlcWorkspace from "@/components/modules/sdlc-workspace";
+import QuantResearch from "@/components/modules/quant-research";
+import KnowledgeBase from "@/components/modules/knowledge-base";
+import FeasibilityCosting from "@/components/modules/feasibility-costing";
+import LogisticsTracker from "@/components/modules/logistics-tracker";
+import MachineryProcurement from "@/components/modules/machinery-procurement";
+import WellnessDashboard from "@/components/modules/wellness-dashboard";
+import BiometricTracker from "@/components/modules/biometric-tracker";
+import HealthInsights from "@/components/modules/health-insights";
+import NutritionPlanner from "@/components/modules/nutrition-planner";
 
 const COMPONENTS: Record<string, React.ComponentType> = {
   "financial-hub": FinancialHub,
@@ -18,6 +28,16 @@ const COMPONENTS: Record<string, React.ComponentType> = {
   "cil-plant": CilPlant,
   "asset-management": AssetManagement,
   "growth-operations": GrowthOperations,
+  "sdlc-workspace": SdlcWorkspace,
+  "quant-research": QuantResearch,
+  "knowledge-base": KnowledgeBase,
+  "feasibility-costing": FeasibilityCosting,
+  logistics: LogisticsTracker,
+  "machinery-procurement": MachineryProcurement,
+  "wellness-dashboard": WellnessDashboard,
+  "biometric-tracker": BiometricTracker,
+  "health-insights": HealthInsights,
+  "nutrition-planner": NutritionPlanner,
 };
 
 export default function ModulePage({ params }: { params: { key: string; slug: string } }) {

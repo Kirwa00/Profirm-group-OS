@@ -8,7 +8,7 @@ export function StatTile({
   sub?: string;
 }) {
   return (
-    <div className="bg-surface-container-lowest border border-outline-variant rounded-lg p-4">
+    <div className="bg-surface-container-lowest border border-outline-variant border-t-2 border-t-metallic-gold p-4">
       <p className="font-label text-label-sm text-slate-gray uppercase tracking-wide mb-1">
         {label}
       </p>
@@ -28,7 +28,7 @@ export function SectionCard({
   className?: string;
 }) {
   return (
-    <div className={`bg-surface-container-lowest border border-outline-variant rounded-lg p-5 ${className}`}>
+    <div className={`bg-surface-container-lowest border border-outline-variant p-5 ${className}`}>
       <h2 className="font-headline text-body-lg font-bold text-on-surface mb-4">{title}</h2>
       {children}
     </div>

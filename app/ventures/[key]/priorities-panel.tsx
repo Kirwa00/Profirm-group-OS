@@ -33,7 +33,7 @@ export default function PrioritiesPanel({
   const addPriorityWithVenture = addPriority.bind(null, ventureId, ventureKey);
 
   return (
-    <div className="bg-surface-container-lowest border border-outline-variant rounded-lg p-5">
+    <div className="bg-surface-container-lowest border border-outline-variant p-5">
       <h2 className="font-headline text-body-lg font-bold text-on-surface mb-4">Next Priorities</h2>
       <div className="space-y-3 mb-4">
         {priorities.length === 0 ? (

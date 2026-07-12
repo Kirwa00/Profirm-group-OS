@@ -1,9 +1,18 @@
-import type { Config } from "tailwindcss";
+const path = require("path");
 
 // Tokens sourced from stitch_extracted/stitch_sdlc_blue_gold_interface/venture_integrity/DESIGN.md
-const config: Config = {
+//
+// Plain .js (not .ts) — Next.js's built-in PostCSS/Tailwind integration was
+// silently failing to load tailwind.config.ts, falling back to Tailwind's
+// own default config (content: []), which explains why only the Tailwind
+// base/reset layer compiled and every utility class was missing at runtime.
+/** @type {import('tailwindcss').Config} */
+const config = {
   darkMode: "class",
-  content: ["./app/**/*.{ts,tsx}", "./components/**/*.{ts,tsx}"],
+  content: [
+    path.join(__dirname, "app/**/*.{ts,tsx}"),
+    path.join(__dirname, "components/**/*.{ts,tsx}"),
+  ],
   theme: {
     extend: {
       colors: {
@@ -85,4 +94,4 @@ const config: Config = {
   plugins: [],
 };
 
-export default config;
+module.exports = config;

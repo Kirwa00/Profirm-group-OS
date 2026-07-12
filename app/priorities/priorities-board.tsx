@@ -24,7 +24,7 @@ export default function PrioritiesBoard({ items }: { items: Item[] }) {
   const formRef = useRef<HTMLFormElement>(null);
 
   return (
-    <div className="bg-surface-container-lowest border border-outline-variant rounded-lg p-5">
+    <div className="bg-surface-container-lowest border border-outline-variant p-5">
       <h2 className="font-headline text-body-lg font-bold text-on-surface mb-4">
         Cross-Venture Priorities This Week
       </h2>

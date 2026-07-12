@@ -32,7 +32,7 @@ export default function DocumentsPanel({
   const addDocWithVenture = addKeyDocument.bind(null, ventureId, ventureKey);
 
   return (
-    <div className="bg-surface-container-lowest border border-outline-variant rounded-lg p-5">
+    <div className="bg-surface-container-lowest border border-outline-variant p-5">
       <h2 className="font-headline text-body-lg font-bold text-on-surface mb-4">Key Documents</h2>
       <div className="space-y-2 mb-4">
         {documents.length === 0 ? (

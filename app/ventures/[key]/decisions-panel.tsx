@@ -33,7 +33,7 @@ export default function DecisionsPanel({
   const addDecisionWithVenture = addDecision.bind(null, ventureId, ventureKey);
 
   return (
-    <div className="bg-surface-container-lowest border border-outline-variant rounded-lg p-5">
+    <div className="bg-surface-container-lowest border border-outline-variant p-5">
       <h2 className="font-headline text-body-lg font-bold text-on-surface mb-4">Open Decisions</h2>
       <div className="space-y-3 mb-4">
         {decisions.length === 0 ? (

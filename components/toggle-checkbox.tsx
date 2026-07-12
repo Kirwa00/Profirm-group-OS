@@ -2,6 +2,10 @@
 
 import { useTransition } from "react";
 
+// Icon-based checklist item matching the Stitch mockups' pattern exactly
+// (check_box / check_box_outline_blank material icons — see the "Next 3
+// Priorities" lists in ventureos_portfolio_overview/code.html) rather than a
+// native checkbox input.
 export default function ToggleCheckbox({
   checked,
   onToggle,
@@ -14,21 +18,26 @@ export default function ToggleCheckbox({
   const [isPending, startTransition] = useTransition();
 
   return (
-    <label className="flex items-center gap-3 cursor-pointer group">
-      <input
-        type="checkbox"
-        checked={checked}
-        disabled={isPending}
-        onChange={() => startTransition(() => onToggle())}
-        className="w-4 h-4 rounded-sm border-2 border-outline-variant text-primary focus:ring-0 accent-deep-navy cursor-pointer"
-      />
+    <button
+      type="button"
+      disabled={isPending}
+      onClick={() => startTransition(() => onToggle())}
+      className="w-full flex items-start gap-3 text-left disabled:opacity-60"
+    >
       <span
-        className={`font-body text-body-md ${
+        className={`material-symbols-outlined text-lg mt-0.5 ${
+          checked ? "text-success-green" : "text-slate-gray"
+        }`}
+      >
+        {checked ? "check_box" : "check_box_outline_blank"}
+      </span>
+      <span
+        className={`font-body text-body-sm ${
           checked ? "line-through text-slate-gray" : "text-on-surface"
         }`}
       >
         {label}
       </span>
-    </label>
+    </button>
   );
 }

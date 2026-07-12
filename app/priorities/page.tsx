@@ -19,10 +19,10 @@ export default async function PrioritiesPage() {
 
   return (
     <AppShell>
-      <h1 className="font-headline text-headline-lg text-deep-navy mb-1">
+      <h1 className="font-headline text-display-lg text-deep-navy mb-2">
         Priorities &amp; Watchlist
       </h1>
-      <p className="font-body text-body-md text-slate-gray mb-6">
+      <p className="font-body text-body-lg text-slate-gray mb-8 max-w-2xl">
         What matters across every venture this week.
       </p>
 

@@ -22,7 +22,7 @@ export default function NewVentureForm() {
   const [state, formAction] = useFormState(createVenture, {});
 
   return (
-    <form action={formAction} className="space-y-5 bg-surface-container-lowest border border-outline-variant rounded-lg p-6">
+    <form action={formAction} className="space-y-5 bg-surface-container-lowest border border-outline-variant p-6">
       <div className="grid grid-cols-1 sm:grid-cols-[80px_1fr] gap-4">
         <div>
           <label className="font-label text-label-sm text-on-surface-variant uppercase tracking-wide block mb-1">

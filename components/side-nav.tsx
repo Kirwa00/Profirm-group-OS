@@ -6,6 +6,7 @@ import { usePathname } from "next/navigation";
 const NAV_ITEMS = [
   { href: "/", label: "Portfolio", icon: "dashboard" },
   { href: "/priorities", label: "Priorities & Watchlist", icon: "insights" },
+  { href: "/tools", label: "OS Tools", icon: "settings_suggest" },
 ];
 
 export default function SideNav() {

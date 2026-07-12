@@ -96,24 +96,6 @@ const VENTURES = [
   },
 ];
 
-// Modules that exist as mockups in stitch_sdlc_blue_gold_interface/ but
-// haven't been converted into working pages yet — tracked as real backlog
-// inside the OS instead of a separate doc.
-const BACKLOG_MODULES = [
-  "Convert profirm_os_workflow_orchestration_builder mockup into a working page",
-  "Convert profirm_os_agent_intelligence_monitor mockup into a working page",
-  "Convert profirm_os_document_ai_extraction_hub mockup into a working page",
-  "Convert profirm_os_connectivity_integrations_library mockup into a working page",
-  "Convert ventureos_knowledge_base mockup into a working page",
-  "Convert ai_startup_studio_sdlc_workspace mockup into a working page",
-  "Convert profirm_quant_trading_research mockup into a working page",
-  "Convert manufacturing_feasibility_production_hub mockup into a working page",
-  "Convert manufacturing_detailed_costing_feasibility_hub mockup into a working page",
-  "Convert manufacturing_logistics_supply_chain_tracker mockup into a working page",
-  "Convert industrial_hub_machinery_procurement_specs mockup into a working page",
-  "Convert executive_protocol_* (4) personal health mockups into working pages",
-];
-
 async function main() {
   const adminEmail = process.env.SEED_ADMIN_EMAIL ?? "admin@profirmgroup.com";
   const adminPassword = process.env.SEED_ADMIN_PASSWORD ?? "ProfirmOS2026!";
@@ -172,25 +154,6 @@ async function main() {
     }
   }
 
-  const existingCrossPriorities = await prisma.crossVenturePriority.count();
-  if (existingCrossPriorities === 0) {
-    await prisma.crossVenturePriority.createMany({
-      data: BACKLOG_MODULES.map((text, i) => ({ text, rank: i })),
-    });
-    console.log(`Seeded ${BACKLOG_MODULES.length} backlog cross-venture priorities.`);
-  }
-
-  const existingWatchlist = await prisma.watchlistItem.count();
-  if (existingWatchlist === 0) {
-    await prisma.watchlistItem.create({
-      data: {
-        text: "No hosted database connected in production yet",
-        severity: "MEDIUM",
-        note: "Set DATABASE_URL to a Supabase/Neon Postgres instance before relying on this for real tracking.",
-        relatedVentureKeys: [],
-      },
-    });
-  }
 }
 
 main()
