@@ -1,0 +1,116 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+enum VentureCategory {
+  AI_STARTUP_STUDIO
+  AI_AUTOMATION_AGENTS
+  TRADING_QUANT_RESEARCH
+  MANUFACTURING_INDUSTRIAL
+  MINING_COMMODITIES
+  HEALTHCARE_BUSINESSES
+  PERSONAL_HEALTH
+  PROPERTY_HOSPITALITY
+  EDUCATION_VENTURES
+  AI_KNOWLEDGE_BASE
+  LEGAL_FINANCE
+}
+
+enum VentureStatus {
+  IDEA
+  VALIDATING
+  BUILDING
+  SCALING
+}
+
+enum WatchlistSeverity {
+  LOW
+  MEDIUM
+  HIGH
+}
+
+enum UserRole {
+  ADMIN
+  VIEWER
+}
+
+model User {
+  id           String   @id @default(cuid())
+  email        String   @unique
+  name         String
+  passwordHash String
+  role         UserRole @default(ADMIN)
+  createdAt    DateTime @default(now())
+}
+
+model Venture {
+  id          String          @id @default(cuid())
+  key         String          @unique
+  name        String
+  emoji       String          @default("📁")
+  category    VentureCategory
+  status      VentureStatus   @default(IDEA)
+  description String          @default("")
+  externalUrl String?
+  rank        Int             @default(0)
+  createdAt   DateTime        @default(now())
+  updatedAt   DateTime        @updatedAt
+
+  documents  KeyDocument[]
+  decisions  Decision[]
+  priorities Priority[]
+}
+
+model KeyDocument {
+  id        String   @id @default(cuid())
+  ventureId String
+  venture   Venture  @relation(fields: [ventureId], references: [id], onDelete: Cascade)
+  title     String
+  url       String
+  type      String   @default("doc")
+  createdAt DateTime @default(now())
+}
+
+model Decision {
+  id         String    @id @default(cuid())
+  ventureId  String
+  venture    Venture   @relation(fields: [ventureId], references: [id], onDelete: Cascade)
+  text       String
+  isOpen     Boolean   @default(true)
+  resolvedAt DateTime?
+  createdAt  DateTime  @default(now())
+}
+
+model Priority {
+  id        String    @id @default(cuid())
+  ventureId String
+  venture   Venture   @relation(fields: [ventureId], references: [id], onDelete: Cascade)
+  text      String
+  rank      Int       @default(0)
+  isDone    Boolean   @default(false)
+  dueDate   DateTime?
+  createdAt DateTime  @default(now())
+}
+
+model CrossVenturePriority {
+  id        String   @id @default(cuid())
+  text      String
+  rank      Int      @default(0)
+  weekOf    DateTime @default(now())
+  isDone    Boolean  @default(false)
+  createdAt DateTime @default(now())
+}
+
+model WatchlistItem {
+  id                String            @id @default(cuid())
+  text              String
+  severity          WatchlistSeverity @default(MEDIUM)
+  note              String            @default("")
+  relatedVentureKeys String[]         @default([])
+  createdAt         DateTime          @default(now())
+}
