@@ -7,6 +7,7 @@ import StatusSelect from "./status-select";
 import DecisionsPanel from "./decisions-panel";
 import PrioritiesPanel from "./priorities-panel";
 import DocumentsPanel from "./documents-panel";
+import TasksPanel from "./tasks-panel";
 import Link from "next/link";
 
 export default async function VentureDetailPage({ params }: { params: { key: string } }) {
@@ -30,6 +31,7 @@ export default async function VentureDetailPage({ params }: { params: { key: str
           documents: { orderBy: { createdAt: "asc" } },
           decisions: { orderBy: { createdAt: "asc" } },
           priorities: { orderBy: [{ isDone: "asc" }, { rank: "asc" }] },
+          tasks: { orderBy: [{ isDone: "asc" }, { createdAt: "desc" }] },
         },
       }),
     null
@@ -111,6 +113,19 @@ export default async function VentureDetailPage({ params }: { params: { key: str
           ventureKey={venture.key}
           priorities={venture.priorities}
         />
+        <div className="lg:col-span-2">
+          <TasksPanel
+            ventureId={venture.id}
+            ventureKey={venture.key}
+            tasks={venture.tasks.map((t) => ({
+              id: t.id,
+              text: t.text,
+              isDone: t.isDone,
+              dueDate: t.dueDate ? t.dueDate.toISOString() : null,
+              completedAt: t.completedAt ? t.completedAt.toISOString() : null,
+            }))}
+          />
+        </div>
         <div className="lg:col-span-2">
           <DocumentsPanel
             ventureId={venture.id}

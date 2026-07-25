@@ -85,6 +85,28 @@ export async function togglePriority(id: string, key: string, isDone: boolean) {
   revalidatePath(`/ventures/${key}`);
 }
 
+export async function addTask(ventureId: string, key: string, formData: FormData) {
+  if (!isDbConfigured()) return;
+  const text = String(formData.get("text") ?? "").trim();
+  if (!text) return;
+  const dueDateRaw = String(formData.get("dueDate") ?? "").trim();
+  await prisma.task.create({
+    data: { ventureId, text, dueDate: dueDateRaw ? new Date(dueDateRaw) : null },
+  });
+  revalidatePath(`/ventures/${key}`);
+  revalidatePath("/calendar");
+}
+
+export async function toggleTask(id: string, key: string, isDone: boolean) {
+  if (!isDbConfigured()) return;
+  await prisma.task.update({
+    where: { id },
+    data: { isDone: !isDone, completedAt: !isDone ? new Date() : null },
+  });
+  revalidatePath(`/ventures/${key}`);
+  revalidatePath("/calendar");
+}
+
 export async function addKeyDocument(ventureId: string, key: string, formData: FormData) {
   if (!isDbConfigured()) return;
   const title = String(formData.get("title") ?? "").trim();

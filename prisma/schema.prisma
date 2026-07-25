@@ -64,6 +64,7 @@ model Venture {
   documents  KeyDocument[]
   decisions  Decision[]
   priorities Priority[]
+  tasks      Task[]
 }
 
 model KeyDocument {
@@ -95,6 +96,21 @@ model Priority {
   isDone    Boolean   @default(false)
   dueDate   DateTime?
   createdAt DateTime  @default(now())
+}
+
+// A work item logged against a venture. Distinct from Priority (a strategic
+// "what matters next" bullet) — Task is the day-to-day work log: what you
+// did, and when, so the calendar can show it against completedAt/dueDate to
+// reflect time/energy allocation per venture over time.
+model Task {
+  id          String    @id @default(cuid())
+  ventureId   String
+  venture     Venture   @relation(fields: [ventureId], references: [id], onDelete: Cascade)
+  text        String
+  isDone      Boolean   @default(false)
+  dueDate     DateTime?
+  completedAt DateTime?
+  createdAt   DateTime  @default(now())
 }
 
 model CrossVenturePriority {
