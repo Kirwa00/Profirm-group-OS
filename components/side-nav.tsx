@@ -2,13 +2,7 @@
 
 import Link from "next/link";
 import { usePathname } from "next/navigation";
-
-const NAV_ITEMS = [
-  { href: "/", label: "Portfolio", icon: "dashboard" },
-  { href: "/calendar", label: "Calendar", icon: "calendar_month" },
-  { href: "/priorities", label: "Priorities & Watchlist", icon: "insights" },
-  { href: "/tools", label: "OS Tools", icon: "settings_suggest" },
-];
+import { NAV_ITEMS, isNavActive } from "@/lib/nav";
 
 export default function SideNav() {
   const pathname = usePathname();
@@ -31,7 +25,7 @@ export default function SideNav() {
 
       <nav className="flex-1 space-y-1 px-4">
         {NAV_ITEMS.map((item) => {
-          const active = item.href === "/" ? pathname === "/" : pathname.startsWith(item.href);
+          const active = isNavActive(item.href, pathname);
           return (
             <Link
               key={item.href}

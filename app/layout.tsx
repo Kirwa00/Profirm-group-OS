@@ -1,4 +1,4 @@
-import type { Metadata } from "next";
+import type { Metadata, Viewport } from "next";
 import { Manrope, Inter, JetBrains_Mono } from "next/font/google";
 import "./globals.css";
 
@@ -21,6 +21,23 @@ const jetbrainsMono = JetBrains_Mono({
 export const metadata: Metadata = {
   title: "Profirm OS",
   description: "Profirm Group — venture management operating system",
+  applicationName: "Profirm OS",
+  manifest: "/manifest.webmanifest",
+  icons: {
+    icon: "/favicon-32.png",
+    apple: "/apple-touch-icon.png",
+  },
+  appleWebApp: {
+    capable: true,
+    title: "Profirm OS",
+    statusBarStyle: "black-translucent",
+  },
+};
+
+export const viewport: Viewport = {
+  width: "device-width",
+  initialScale: 1,
+  themeColor: "#0A192F",
 };
 
 export default function RootLayout({ children }: { children: React.ReactNode }) {

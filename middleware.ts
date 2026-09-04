@@ -6,7 +6,10 @@ import { authConfig } from "./auth.config";
 // @prisma/client via the Credentials provider's authorize()).
 const { auth } = NextAuth(authConfig);
 
-const PUBLIC_PATHS = ["/login", "/api/auth"];
+// Paths that must load without a session: the login page, the auth API, and
+// the PWA manifest (the browser — and the login page itself — fetch it while
+// logged out).
+const PUBLIC_PATHS = ["/login", "/api/auth", "/manifest.webmanifest"];
 
 export default auth((req) => {
   const { pathname } = req.nextUrl;
@@ -30,5 +33,9 @@ export default auth((req) => {
 });
 
 export const config = {
-  matcher: ["/((?!_next/static|_next/image|favicon.ico).*)"],
+  // Skip Next internals and any static asset by extension (icons, manifest),
+  // so PWA files aren't bounced to /login when a database is configured.
+  matcher: [
+    "/((?!_next/static|_next/image|favicon.ico|.*\\.(?:png|jpg|jpeg|gif|svg|ico|webmanifest)$).*)",
+  ],
 };
