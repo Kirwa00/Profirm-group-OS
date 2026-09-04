@@ -73,7 +73,13 @@ model KeyDocument {
   venture   Venture  @relation(fields: [ventureId], references: [id], onDelete: Cascade)
   title     String
   url       String
-  type      String   @default("doc")
+  // "link" = an external URL/path the user pasted; "file" = uploaded to Vercel Blob.
+  type      String   @default("link")
+  // Set only for type = "file": the Blob pathname (needed to delete the object),
+  // the byte size, and the reported MIME type.
+  pathname    String?
+  size        Int?
+  contentType String?
   createdAt DateTime @default(now())
 }
 
