@@ -39,6 +39,28 @@ npm run dev
 Seeded admin login: `admin@profirmgroup.com` / `ProfirmOS2026!` (override via
 `SEED_ADMIN_EMAIL` / `SEED_ADMIN_PASSWORD` env vars before seeding).
 
+## Document uploads
+
+Each venture's **Key Documents** panel takes real file uploads (PDF, Office,
+images, CSV — up to 12 MB) alongside pasted links. Files live in **Supabase
+Storage** (same project as the database):
+
+1. Supabase dashboard → **Storage** → new **private** bucket `venture-documents`
+   (the app also creates it automatically on first upload).
+2. Supabase dashboard → **Project Settings → API** → set three env vars (locally
+   in `.env`, and in the Vercel project):
+   - `NEXT_PUBLIC_SUPABASE_URL` — Project URL
+   - `NEXT_PUBLIC_SUPABASE_ANON_KEY` — anon/public key
+   - `SUPABASE_SERVICE_ROLE_KEY` — service_role key (**server only**)
+
+Flow (`app/ventures/actions.ts` + `documents-panel.tsx`): `createDocumentUploadUrl`
+signs a one-shot upload URL with the service-role key → the browser PUTs the
+file straight to Supabase (dodging Vercel's 4.5 MB Server Action body limit) →
+`saveUploadedDocument` writes the `KeyDocument` row. The bucket is private, so
+`app/ventures/[key]/page.tsx` mints fresh 1-hour signed download URLs at render
+time. `deleteKeyDocument` removes the object and the row together. Without the
+env vars, pasted links still work and uploads show a clear error.
+
 ## Structure
 
 - `app/` — pages (`/`, `/ventures/[key]`, `/ventures/new`, `/priorities`,

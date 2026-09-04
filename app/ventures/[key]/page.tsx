@@ -1,6 +1,8 @@
 import { notFound } from "next/navigation";
 import AppShell from "@/components/app-shell";
 import { prisma, isDbConfigured, safeQuery } from "@/lib/prisma";
+import { supabaseAdmin } from "@/lib/supabase";
+import { DOCUMENTS_BUCKET } from "@/lib/storage";
 import { CATEGORY_META } from "@/lib/constants";
 import { getModulesForVenture } from "@/lib/modules";
 import StatusSelect from "./status-select";
@@ -38,6 +40,36 @@ export default async function VentureDetailPage({ params }: { params: { key: str
   );
 
   if (!venture) notFound();
+
+  // Swap each uploaded file's stored path for a fresh, short-lived signed
+  // download URL. Links (type !== "file") pass through untouched.
+  const filePaths = venture.documents
+    .filter((d) => d.type === "file" && d.pathname)
+    .map((d) => d.pathname as string);
+  const signedUrlByPath = new Map<string, string>();
+  if (filePaths.length > 0) {
+    const client = supabaseAdmin();
+    if (client) {
+      const { data } = await client.storage
+        .from(DOCUMENTS_BUCKET)
+        .createSignedUrls(filePaths, 60 * 60);
+      for (const entry of data ?? []) {
+        if (entry.path && entry.signedUrl) signedUrlByPath.set(entry.path, entry.signedUrl);
+      }
+    }
+  }
+
+  const documents = venture.documents.map((d) => ({
+    id: d.id,
+    title: d.title,
+    url:
+      d.type === "file"
+        ? signedUrlByPath.get(d.pathname ?? "") ?? null
+        : d.url,
+    type: d.type,
+    size: d.size,
+    contentType: d.contentType,
+  }));
 
   const category = CATEGORY_META[venture.category];
   const openDecisions = venture.decisions.filter((d) => d.isOpen);
@@ -130,7 +162,7 @@ export default async function VentureDetailPage({ params }: { params: { key: str
           <DocumentsPanel
             ventureId={venture.id}
             ventureKey={venture.key}
-            documents={venture.documents}
+            documents={documents}
           />
         </div>
       </div>
