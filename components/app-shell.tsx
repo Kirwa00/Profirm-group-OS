@@ -2,6 +2,7 @@ import Link from "next/link";
 import { auth } from "@/auth";
 import { isDbConfigured } from "@/lib/prisma";
 import SideNav from "./side-nav";
+import MobileNav from "./mobile-nav";
 import SignOutButton from "./sign-out-button";
 
 export default async function AppShell({ children }: { children: React.ReactNode }) {
@@ -11,11 +12,14 @@ export default async function AppShell({ children }: { children: React.ReactNode
   return (
     <div className="min-h-screen">
       <header className="bg-surface border-b border-outline-variant w-full h-16 flex justify-between items-center px-margin-mobile lg:px-margin-desktop sticky top-0 z-40">
-        <Link href="/" className="flex items-center gap-2 shrink-0">
-          <span className="font-headline text-headline-md font-bold text-deep-navy">
-            Profirm OS
-          </span>
-        </Link>
+        <div className="flex items-center gap-1 shrink-0">
+          <MobileNav />
+          <Link href="/" className="flex items-center gap-2">
+            <span className="font-headline text-headline-md font-bold text-deep-navy">
+              Profirm OS
+            </span>
+          </Link>
+        </div>
 
         {session?.user ? (
           <div className="hidden sm:flex items-center bg-surface-container px-3 py-1.5 border border-outline-variant mx-6 flex-1 max-w-xs">
