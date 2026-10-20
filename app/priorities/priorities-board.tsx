@@ -1,9 +1,13 @@
 "use client";
 
-import { useRef } from "react";
+import { useRef, useTransition } from "react";
 import { useFormStatus } from "react-dom";
 import ToggleCheckbox from "@/components/toggle-checkbox";
-import { addCrossVenturePriority, toggleCrossVenturePriority } from "./actions";
+import {
+  addCrossVenturePriority,
+  deleteCrossVenturePriority,
+  toggleCrossVenturePriority,
+} from "./actions";
 
 type Item = { id: string; text: string; isDone: boolean };
 
@@ -16,6 +20,22 @@ function AddButton() {
       className="px-3 py-2 bg-surface-container text-on-surface rounded font-label text-label-sm hover:bg-surface-container-high disabled:opacity-60"
     >
       Add
+    </button>
+  );
+}
+
+function RemoveButton({ id }: { id: string }) {
+  const [isPending, startTransition] = useTransition();
+  return (
+    <button
+      type="button"
+      onClick={() => startTransition(() => deleteCrossVenturePriority(id))}
+      disabled={isPending}
+      aria-label="Remove priority"
+      title="Remove"
+      className="shrink-0 material-symbols-outlined text-base text-slate-gray hover:text-error disabled:opacity-60"
+    >
+      close
     </button>
   );
 }
@@ -33,12 +53,14 @@ export default function PrioritiesBoard({ items }: { items: Item[] }) {
           <p className="font-body text-body-sm text-slate-gray">Nothing on the board yet.</p>
         ) : (
           items.map((item) => (
-            <ToggleCheckbox
-              key={item.id}
-              checked={item.isDone}
-              label={item.text}
-              onToggle={() => toggleCrossVenturePriority(item.id, item.isDone)}
-            />
+            <div key={item.id} className="flex items-start justify-between gap-2">
+              <ToggleCheckbox
+                checked={item.isDone}
+                label={item.text}
+                onToggle={() => toggleCrossVenturePriority(item.id, item.isDone)}
+              />
+              <RemoveButton id={item.id} />
+            </div>
           ))
         )}
       </div>

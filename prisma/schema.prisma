@@ -136,3 +136,24 @@ model WatchlistItem {
   relatedVentureKeys String[]         @default([])
   createdAt         DateTime          @default(now())
 }
+
+// General-purpose to-do list on the Priorities & Watchlist page. Deliberately
+// not tied to a venture — it's for everyday things.
+model Todo {
+  id          String    @id @default(cuid())
+  text        String
+  isDone      Boolean   @default(false)
+  dueDate     DateTime?
+  completedAt DateTime?
+  createdAt   DateTime  @default(now())
+}
+
+// Free-form notes, also on the Priorities & Watchlist page. Not venture-scoped.
+model Note {
+  id        String   @id @default(cuid())
+  title     String   @default("")
+  body      String   @default("")
+  pinned    Boolean  @default(false)
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+}
