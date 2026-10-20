@@ -3,6 +3,7 @@ import AppShell from "@/components/app-shell";
 import { prisma, isDbConfigured, safeQuery } from "@/lib/prisma";
 import { supabaseAdmin } from "@/lib/supabase";
 import { DOCUMENTS_BUCKET } from "@/lib/storage";
+import { listMailAddresses } from "@/lib/mail";
 import { CATEGORY_META } from "@/lib/constants";
 import { getModulesForVenture } from "@/lib/modules";
 import StatusSelect from "./status-select";
@@ -13,6 +14,11 @@ import TasksPanel from "./tasks-panel";
 import RenameVenture from "./rename-venture";
 import DeleteVenture from "./delete-venture";
 import Link from "next/link";
+
+// The "email documents" server action runs under this route's limits: it
+// downloads attachments and talks to an SMTP server, which can outlast the
+// default function timeout.
+export const maxDuration = 60;
 
 export default async function VentureDetailPage({ params }: { params: { key: string } }) {
   if (!isDbConfigured()) {
@@ -164,6 +170,8 @@ export default async function VentureDetailPage({ params }: { params: { key: str
           <DocumentsPanel
             ventureId={venture.id}
             ventureKey={venture.key}
+            ventureName={venture.name}
+            mailAccounts={listMailAddresses()}
             documents={documents}
           />
         </div>

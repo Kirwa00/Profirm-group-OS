@@ -61,6 +61,27 @@ file straight to Supabase (dodging Vercel's 4.5 MB Server Action body limit) →
 time. `deleteKeyDocument` removes the object and the row together. Without the
 env vars, pasted links still work and uploads show a clear error.
 
+## Emailing project documents
+
+On a project page, tick documents in **Key Documents** and press **Email**. The
+dialog shows the sender, recipients, subject and every attachment/link before
+anything is sent. Uploaded files are attached; pasted links go in the body.
+Mail is sent through Gmail SMTP from the mailbox you pick, so it also lands in
+that mailbox's **Sent** folder.
+
+Setup (once, per Gmail account you want to send from):
+
+1. Turn on 2-Step Verification for the account, then create an **app password**
+   at <https://myaccount.google.com/apppasswords>.
+2. Set `MAIL_ACCOUNTS` (locally in `.env`, and in Vercel) to
+   `address:app-password` pairs, comma-separated — e.g.
+   `emmanuelkirwa8@gmail.com:abcdefghijklmnop,profirmventures@gmail.com:qrstuvwxyzabcdef`.
+
+Guardrails: only signed-in **ADMIN** users can send; the sender must be one of the
+configured addresses; at most 10 recipients and 18 MB of attachments per message;
+documents must belong to the project being emailed. The app passwords are
+server-only and never sent to the browser (the browser only learns the addresses).
+
 ## Structure
 
 - `app/` — pages (`/`, `/ventures/[key]`, `/ventures/new`, `/priorities`,
