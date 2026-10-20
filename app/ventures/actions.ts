@@ -2,6 +2,7 @@
 
 import { revalidatePath } from "next/cache";
 import { redirect } from "next/navigation";
+import { auth } from "@/auth";
 import { prisma, isDbConfigured } from "@/lib/prisma";
 import { isStorageConfigured, supabaseAdmin, ensureDocumentsBucket } from "@/lib/supabase";
 import { DOCUMENTS_BUCKET, sanitizeFilename } from "@/lib/storage";
@@ -53,6 +54,88 @@ export async function updateVentureDescription(key: string, formData: FormData) 
   const description = String(formData.get("description") ?? "").trim();
   await prisma.venture.update({ where: { key }, data: { description } });
   revalidatePath(`/ventures/${key}`);
+}
+
+const MAX_VENTURE_NAME = 100;
+
+// Changes only the display name. The `key` (URL slug) is deliberately left
+// alone: module routing (lib/modules.ts) and watchlist references
+// (WatchlistItem.relatedVentureKeys) are keyed on it, so re-slugging would
+// silently orphan both.
+export async function renameVenture(key: string, name: string): Promise<{ error?: string }> {
+  if (!isDbConfigured()) return { error: "Database not connected." };
+  const next = name.trim();
+  if (!next) return { error: "Name can't be empty." };
+  if (next.length > MAX_VENTURE_NAME) {
+    return { error: `Name must be ${MAX_VENTURE_NAME} characters or fewer.` };
+  }
+  const existing = await prisma.venture.findUnique({ where: { key } });
+  if (!existing) return { error: "Project not found." };
+  if (existing.name === next) return {};
+
+  await prisma.venture.update({ where: { key }, data: { name: next } });
+  revalidatePath("/");
+  revalidatePath(`/ventures/${key}`);
+  revalidatePath("/calendar");
+  revalidatePath("/priorities");
+  return {};
+}
+
+// Permanently deletes a venture and everything under it (documents, decisions,
+// priorities, tasks cascade via the schema). The caller must pass the venture's
+// exact current name; that check is enforced here, not just in the UI.
+export async function deleteVenture(
+  key: string,
+  confirmName: string,
+): Promise<{ error?: string }> {
+  if (!isDbConfigured()) return { error: "Database not connected." };
+
+  const session = await auth();
+  if (!session?.user) return { error: "You must be signed in to delete a project." };
+
+  const venture = await prisma.venture.findUnique({
+    where: { key },
+    include: { documents: { select: { type: true, pathname: true } } },
+  });
+  if (!venture) return { error: "Project not found." };
+  if (confirmName.trim() !== venture.name) {
+    return { error: "The name you typed doesn't match this project." };
+  }
+
+  // Uploaded files live in Supabase Storage, outside the DB cascade — remove
+  // them first so they aren't orphaned. Best-effort: a storage failure is
+  // logged but doesn't block the delete.
+  const paths = venture.documents
+    .filter((d) => d.type === "file" && d.pathname)
+    .map((d) => d.pathname as string);
+  if (paths.length > 0) {
+    const client = supabaseAdmin();
+    if (client) {
+      const { error } = await client.storage.from(DOCUMENTS_BUCKET).remove(paths);
+      if (error) console.error("[storage] venture file cleanup failed:", error.message);
+    }
+  }
+
+  // Watchlist items reference ventures by key in a plain string[] (no FK), so
+  // strip the deleted key from them as part of the same transaction.
+  const watchlist = await prisma.watchlistItem.findMany({
+    where: { relatedVentureKeys: { has: key } },
+    select: { id: true, relatedVentureKeys: true },
+  });
+  await prisma.$transaction([
+    ...watchlist.map((w) =>
+      prisma.watchlistItem.update({
+        where: { id: w.id },
+        data: { relatedVentureKeys: w.relatedVentureKeys.filter((k) => k !== key) },
+      }),
+    ),
+    prisma.venture.delete({ where: { key } }),
+  ]);
+
+  revalidatePath("/");
+  revalidatePath("/calendar");
+  revalidatePath("/priorities");
+  redirect("/");
 }
 
 export async function addDecision(ventureId: string, key: string, formData: FormData) {
