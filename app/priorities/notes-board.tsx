@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useTransition } from "react";
+import { useEffect, useState, useTransition } from "react";
 import { createNote, deleteNote, toggleNotePinned, updateNote } from "./actions";
 
 type Note = {
@@ -90,6 +90,14 @@ function NoteEditor({
 
 function NoteCard({ note }: { note: Note }) {
   const [editing, setEditing] = useState(false);
+  // "Last edited" is shown in the viewer's own time zone and locale, which the
+  // server can't know — fill it in after mount so server and client HTML match.
+  const [updated, setUpdated] = useState("");
+  useEffect(() => {
+    setUpdated(
+      new Date(note.updatedAt).toLocaleDateString(undefined, { month: "short", day: "numeric" }),
+    );
+  }, [note.updatedAt]);
   const [error, setError] = useState<string | null>(null);
   const [isPending, startTransition] = useTransition();
 
@@ -108,11 +116,6 @@ function NoteCard({ note }: { note: Note }) {
       </div>
     );
   }
-
-  const updated = new Date(note.updatedAt).toLocaleDateString(undefined, {
-    month: "short",
-    day: "numeric",
-  });
 
   return (
     <article
