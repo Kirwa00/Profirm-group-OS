@@ -39,6 +39,15 @@ npm run dev
 Seeded admin login: `admin@profirmgroup.com` / `ProfirmOS2026!` (override via
 `SEED_ADMIN_EMAIL` / `SEED_ADMIN_PASSWORD` env vars before seeding).
 
+## To-dos and notes
+
+The **Priorities & Watchlist** page (`/priorities`) has four tabs: **To-do**,
+**Notes**, **Priorities**, **Watchlist**. To-dos and notes are general-purpose —
+they aren't tied to any venture. They live in the `Todo` and `Note` tables; on
+an existing database, create them once by running
+`prisma/sql/2026-10-notes-todos.sql` in the Supabase SQL Editor (or just
+`npm run db:push` if you can reach the database from your machine).
+
 ## Document uploads
 
 Each venture's **Key Documents** panel takes real file uploads (PDF, Office,
