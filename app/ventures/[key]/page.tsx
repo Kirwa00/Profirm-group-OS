@@ -10,6 +10,8 @@ import DecisionsPanel from "./decisions-panel";
 import PrioritiesPanel from "./priorities-panel";
 import DocumentsPanel from "./documents-panel";
 import TasksPanel from "./tasks-panel";
+import RenameVenture from "./rename-venture";
+import DeleteVenture from "./delete-venture";
 import Link from "next/link";
 
 export default async function VentureDetailPage({ params }: { params: { key: string } }) {
@@ -87,7 +89,7 @@ export default async function VentureDetailPage({ params }: { params: { key: str
         <div className="flex items-center gap-3">
           <span className="text-3xl">{venture.emoji}</span>
           <div>
-            <h1 className="font-headline text-headline-lg text-deep-navy">{venture.name}</h1>
+            <RenameVenture ventureKey={venture.key} name={venture.name} />
             <p className="font-label text-label-sm text-slate-gray flex items-center gap-1">
               <span className="material-symbols-outlined text-sm">{category.icon}</span>
               {category.label}
@@ -181,6 +183,17 @@ export default async function VentureDetailPage({ params }: { params: { key: str
           </ul>
         </div>
       ) : null}
+
+      <DeleteVenture
+        ventureKey={venture.key}
+        name={venture.name}
+        counts={{
+          documents: venture.documents.length,
+          decisions: venture.decisions.length,
+          priorities: venture.priorities.length,
+          tasks: venture.tasks.length,
+        }}
+      />
     </AppShell>
   );
 }
