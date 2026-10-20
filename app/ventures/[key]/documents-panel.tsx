@@ -10,6 +10,7 @@ import {
   saveUploadedDocument,
 } from "../actions";
 import { DOCUMENTS_BUCKET, MAX_DOCUMENT_BYTES } from "@/lib/storage";
+import EmailDialog from "./email-documents";
 
 type Doc = {
   id: string;
@@ -52,12 +53,26 @@ function iconFor(doc: Doc) {
 export default function DocumentsPanel({
   ventureId,
   ventureKey,
+  ventureName,
+  mailAccounts,
   documents,
 }: {
   ventureId: string;
   ventureKey: string;
+  ventureName: string;
+  mailAccounts: string[];
   documents: Doc[];
 }) {
+  const [selected, setSelected] = useState<string[]>([]);
+  const [emailing, setEmailing] = useState(false);
+  // Ignore ids of documents that have since been deleted.
+  const selectedDocs = documents.filter((d) => selected.includes(d.id));
+  const allSelected = documents.length > 0 && selectedDocs.length === documents.length;
+
+  function toggleSelected(id: string) {
+    setSelected((cur) => (cur.includes(id) ? cur.filter((x) => x !== id) : [...cur, id]));
+  }
+
   const linkFormRef = useRef<HTMLFormElement>(null);
   const fileInputRef = useRef<HTMLInputElement>(null);
   const [uploading, setUploading] = useState(false);
@@ -126,7 +141,30 @@ export default function DocumentsPanel({
 
   return (
     <div className="bg-surface-container-lowest border border-outline-variant p-5">
-      <h2 className="font-headline text-body-lg font-bold text-on-surface mb-4">Key Documents</h2>
+      <div className="flex items-center justify-between gap-3 mb-4 flex-wrap">
+        <h2 className="font-headline text-body-lg font-bold text-on-surface">Key Documents</h2>
+        {documents.length > 0 ? (
+          <div className="flex items-center gap-2">
+            <button
+              type="button"
+              onClick={() => setSelected(allSelected ? [] : documents.map((d) => d.id))}
+              className="font-label text-label-sm text-slate-gray hover:text-primary"
+            >
+              {allSelected ? "Clear selection" : "Select all"}
+            </button>
+            <button
+              type="button"
+              onClick={() => setEmailing(true)}
+              disabled={selectedDocs.length === 0}
+              title={selectedDocs.length === 0 ? "Tick the documents you want to send" : undefined}
+              className="inline-flex items-center gap-1 px-3 py-2 bg-deep-navy text-white rounded font-label text-label-sm hover:bg-primary-container disabled:opacity-40 disabled:cursor-not-allowed"
+            >
+              <span className="material-symbols-outlined text-base">mail</span>
+              Email{selectedDocs.length > 0 ? ` (${selectedDocs.length})` : ""}
+            </button>
+          </div>
+        ) : null}
+      </div>
 
       <div className="space-y-2 mb-4">
         {documents.length === 0 ? (
@@ -142,6 +180,13 @@ export default function DocumentsPanel({
             );
             return (
               <div key={doc.id} className="flex items-center gap-2 group">
+                <input
+                  type="checkbox"
+                  checked={selected.includes(doc.id)}
+                  onChange={() => toggleSelected(doc.id)}
+                  aria-label={`Select ${doc.title} to email`}
+                  className="shrink-0 w-4 h-4 accent-deep-navy"
+                />
                 {doc.url ? (
                   <a
                     href={doc.url}
@@ -245,6 +290,21 @@ export default function DocumentsPanel({
         />
         <AddButton />
       </form>
+
+      {emailing ? (
+        <EmailDialog
+          ventureKey={ventureKey}
+          ventureName={ventureName}
+          accounts={mailAccounts}
+          docs={selectedDocs.map((d) => ({
+            id: d.id,
+            title: d.title,
+            isFile: d.type === "file",
+            size: d.size,
+          }))}
+          onClose={() => setEmailing(false)}
+        />
+      ) : null}
     </div>
   );
 }
