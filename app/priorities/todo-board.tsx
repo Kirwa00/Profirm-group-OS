@@ -18,9 +18,11 @@ type Todo = {
 
 // Due dates are plain calendar days stored at UTC midnight, so read and show
 // them in UTC — otherwise they can slip a day depending on the viewer's zone.
+// The locale is fixed too: this renders on the server, and a server/browser
+// locale difference ("Oct 18" vs "18 Oct") causes a React hydration mismatch.
 const dayOf = (iso: string) => iso.slice(0, 10);
 const formatDay = (iso: string) =>
-  new Date(iso).toLocaleDateString(undefined, { month: "short", day: "numeric", timeZone: "UTC" });
+  new Date(iso).toLocaleDateString("en-US", { month: "short", day: "numeric", timeZone: "UTC" });
 
 function todayLocal() {
   const d = new Date();
